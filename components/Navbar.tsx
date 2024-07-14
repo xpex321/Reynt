@@ -1,3 +1,4 @@
+'use client'
 import { SVGProps, useState } from 'react';
 import Link from 'next/link';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
