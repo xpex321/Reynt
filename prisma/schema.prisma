@@ -8,26 +8,41 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  email     String    @unique
-  name      String?
-  role      Role      @default(USER)
-  tasks     Task[]    @relation("UserTasks")
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  email          String          @unique
+  name           String?
+  password       String?
+  createdAt      DateTime        @default(now())
+  taskRequests   TaskRequest[]   @relation("UserTaskRequests")
+  assignedTasks  TaskRequest[]   @relation("AssignedTasks")
 }
 
 model Task {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String
-  imageUrl    String
-  requestedAt DateTime @default(now())
-  categoryId  String
-  userId      String
-  location    String
-  user        User     @relation("UserTasks", fields: [userId], references: [id])
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  description    String
+  price          Float
+  imageUrl       String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  taskRequests   TaskRequest[]
 }
 
-enum Role {
-  USER
-  SUPERUSER
+model TaskRequest {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  task           Task            @relation(fields: [taskId], references: [id])
+  taskId         String          @db.ObjectId
+  user           User            @relation(fields: [userId], references: [id], name: "UserTaskRequests")
+  userId         String          @db.ObjectId
+  requestedAt    DateTime        @default(now())
+  status         TaskStatus      @default(PENDING)
+  assignedTo     User?           @relation("AssignedTasks", fields: [assignedToId], references: [id])
+  assignedToId   String?         @db.ObjectId
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
